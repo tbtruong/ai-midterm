@@ -1,0 +1,23 @@
+[[1]]
+
+Call:
+lm(formula = SuiRate ~ Unemp + Arrest + Mental, data = suiTrain)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-7.9847 -2.1668 -0.4242  1.5978 12.6605 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -2.6119082  1.8203165  -1.435    0.153    
+Unemp       -0.4315061  0.1077893  -4.003 8.11e-05 ***
+Arrest       0.0015360  0.0001932   7.948 5.40e-14 ***
+Mental       3.3315988  0.3299065  10.099  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 3.319 on 266 degrees of freedom
+Multiple R-squared:  0.4216,	Adjusted R-squared:  0.4151 
+F-statistic: 64.64 on 3 and 266 DF,  p-value: < 2.2e-16
+
+

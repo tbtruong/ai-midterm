@@ -1,0 +1,22 @@
+[[1]]
+
+Call:
+lm(formula = SuiRate ~ Mental + Disable, data = suiTrain)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.9166 -2.1719 -0.8638  1.6992 13.3793 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -1.2608     1.7176  -0.734    0.464    
+Mental        3.1533     0.4449   7.087 1.22e-11 ***
+Disable       0.2074     0.1273   1.629    0.104    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 3.722 on 267 degrees of freedom
+Multiple R-squared:  0.2698,	Adjusted R-squared:  0.2643 
+F-statistic: 49.32 on 2 and 267 DF,  p-value: < 2.2e-16
+
+
