@@ -5,6 +5,7 @@ library(lmtest)
 library(caret)
 library(Metrics)
 library(leaps)
+library(robustbase)
 
 setwd("/Users/BenMeow/Desktop/Midterm/ai-midterm")
 suidat <- read.csv("/Users/BenMeow/Desktop/Midterm/ai-midterm/SuiRate.csv")
@@ -43,7 +44,7 @@ bestsubset_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsur
 
 
 ############################################################
-# Cross - Validated Error
+# Cross - Validation
 ############################################################
 
 lmFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + Poverty, data = suidat, method = "lm")
@@ -134,3 +135,14 @@ max(suiTrain$SuiRate)
 min(suiTest$SuiRate)
 max(suiTest$SuiRate)
 
+# Generalized Least Squared Model
+suiTrain$resi <- best_model$residuals
+varfunc.ols <- lm(log(resi^2) ~ log(Unemp)+log(Vet)+log(Arrest)+log(Disable)+log(dxu)+log(Uninsured)+log(Mental), data = suiTrain)
+suiTrain$varfunc <- exp(varfunc.ols$fitted.values)
+sui.gls <- lm(SuiRate ~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, weights=1/sqrt(varfunc),data=suiTrain)
+bptest(sui.gls)
+
+# Robust Regression Model
+best_robust <- lmrob(formula = SuiRate ~ Unemp + Vet + Arrest + Mental + Disable + Uninsured + 
+                       dxu, data = suiTrain)
+bptest(best_robust)
