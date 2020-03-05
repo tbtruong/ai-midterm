@@ -5,10 +5,12 @@ library(lmtest)
 library(caret)
 library(Metrics)
 library(leaps)
+library(CombMSC)
 
-setwd("/Users/BenMeow/Desktop/Midterm/ai-midterm")
-suidat <- read.csv("/Users/BenMeow/Desktop/Midterm/ai-midterm/SuiRate.csv")
+setwd("/Users/tungb/Desktop/ai-midterm")
+suidat <- read.csv("/Users/tungb/Desktop/ai-midterm/SuiRate.csv")
 head(suidat)
+names(suidat)[1] <- "SuiRate"
 #Suicide Rate Data + Variables:
 #https://drive.google.com/open?id=1JFalYrbit84vgHNzYlsCnm0j2AOKyz0D#
 
@@ -40,7 +42,8 @@ summary_best<- summary(best_subsets)
 which.max(summary_best$adjr2)
 
 bestsubset_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured, data = suiTrain)
-
+linear_model <- lm(SuiRate~Vet + Arrest + Mental, data = suiTrain)
+summary(linear_model)
 
 ############################################################
 # Cross - Validated Error
@@ -89,7 +92,7 @@ summary(best_mxd)
 best_mxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + mxu, data = suiTrain)
 summary(best_mxu)
 best_dxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, data = suiTrain)
-summary(dxu)
+summary(best_dxu)
 # The interaction term between the disable and uninsured variable increased the adjusted R square while keeping all variables statistically significant
 
 best_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, data = suiTrain)
@@ -109,6 +112,23 @@ lmtest::bptest(best_model)
 hist(error_terms)
 qqnorm(error_terms)
 qqline(error_terms)
+
+
+############################################################
+# Cross - Validated Error
+############################################################
+
+lmFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, data = suiTrain, method = "lm")
+ctrl<-trainControl(method = "cv",number = 10)
+lmCVFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured+dxu, data = suiTrain, method = "lm", trControl = ctrl, metric="RMSE")
+summary(lmCVFit)
+
+
+
+
+bestkfold_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured, data = suidat)
+summary(bestkfold_model)
+
 
 ###############
 # Prediction in R
@@ -134,3 +154,26 @@ max(suiTrain$SuiRate)
 min(suiTest$SuiRate)
 max(suiTest$SuiRate)
 
+#comparison
+
+AIC(best_model)
+BIC(best_model)
+rmse(suiTest$SuiRate, predict(best_model, suiTest))
+mae(suiTest$SuiRate, predict(best_model, suiTest))
+
+AIC(bestkfold_model)
+BIC(bestkfold_model)
+rmse(suiTest$SuiRate, predict(best_model, suiTest))
+mae(suiTest$SuiRate, predict(best_model, suiTest))
+
+
+AIC(bestsubset_model)
+BIC(bestsubset_model)
+rmse(suiTest$SuiRate, predict(best_model, suiTest))
+mae(suiTest$SuiRate, predict(best_model, suiTest))
+
+
+AIC(linear_model)
+BIC(linear_model)
+rmse(suiTest$SuiRate, predict(best_model, suiTest))
+mae(suiTest$SuiRate, predict(best_model, suiTest))
