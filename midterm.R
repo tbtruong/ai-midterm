@@ -21,87 +21,79 @@ suiTest <- suidat[-trainData,]
 head(suiTrain)
 head(suiTest)
 
-# All the models - To determine best model 
-#####################
-# Varaibles: SuiRate, Unemp, Vet, Arrest, Mental, Disable
-# 0 variable
-SuiRate0 <- lm(SuiRate~SuiRate, data = suiTrain)
-# 1 variable
-Unemp1 <- lm(SuiRate~Unemp, data = suiTrain)
-Vet1 <- lm(SuiRate~Vet, data = suiTrain)
-Arrest1 <- lm(SuiRate~Arrest, data = suiTrain)
-Mental1 <- lm(SuiRate~Mental, data = suiTrain)
-Disable1 <- lm(SuiRate~Disable, data = suiTrain)
-# 2 variables
-Unemp_Vet <- lm(SuiRate~Unemp + Vet, data = suiTrain)
-Unemp_Arrest <- lm(SuiRate~Unemp + Arrest, data = suiTrain)
-Unemp_Mental <- lm(SuiRate~Unemp + Mental, data = suiTrain)
-Unemp_Disable <- lm(SuiRate~Unemp + Disable, data = suiTrain)
-Vet_Arrest <- lm(SuiRate~Vet + Arrest, data = suiTrain)
-Vet_Mental <- lm(SuiRate~Vet + Mental, data = suiTrain)
-Vet_Disable <- lm(SuiRate~Vet + Disable, data = suiTrain)
-Arrest_Mental <- lm(SuiRate~Arrest + Mental, data = suiTrain)
-Arrest_Disable <- lm(SuiRate~Arrest + Disable, data = suiTrain)
-Mental_Disable <- lm(SuiRate~Mental + Disable, data = suiTrain)
-# 3 variables
-Unemp_Arrest_Vet <- lm(SuiRate~Unemp + Vet + Arrest, data = suiTrain)
-Unemp_Vet_Mental <- lm(SuiRate~Unemp + Vet + Mental, data = suiTrain)
-Unemp_Vet_Disable <- lm(SuiRate~Unemp + Vet + Disable, data = suiTrain)
-Unemp_Arrest_Mental <- lm(SuiRate~Unemp + Arrest + Mental, data = suiTrain)
-Unemp_Arrest_Disable <- lm(SuiRate~Unemp + Arrest + Disable, data = suiTrain)
-Unemp_Mental_Disable <- lm(SuiRate~Unemp + Mental + Disable, data = suiTrain)
-Vet_Arrest_Mental <- lm(SuiRate~Vet + Arrest + Mental, data = suiTrain)
-Vet_Arrest_Disable <- lm(SuiRate~Vet + Arrest + Disable, data = suiTrain)
-Vet_Mental_Disable <- lm(SuiRate~Vet + Mental + Disable, data = suiTrain)
-Arrest_Mental_Disable <- lm(SuiRate~Arrest + Mental + Disable, data = suiTrain)
-# 4 variables
-Unemp_Arrest_Vet_Mental <- lm(SuiRate~Unemp + Vet + Arrest + Mental, data = suiTrain)
-Unemp_Vet_Disable_Arrest <- lm(SuiRate~Unemp + Vet + Arrest + Disable, data = suiTrain)
-Unemp_Vet_Disable_Mental <- lm(SuiRate~Unemp + Vet + Mental + Disable, data = suiTrain)
-Unemp_Arrest_Mental_Disable <- lm(SuiRate~Unemp + Arrest + Mental + Disable, data = suiTrain)
-Vet_Arrest_Disable_Mental <- lm(SuiRate~Vet + Arrest + Mental + Disable, data = suiTrain)
-# 5 variables 
-Unemp_Arrest_Mental_Disable_Vet <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable, data = suiTrain)
+###Linear Response
+plot(suiTrain$Unemp,suiTrain$SuiRate)
+plot(suiTrain$Vet,suiTrain$SuiRate)
+plot(suiTrain$Arrest,suiTrain$SuiRate)
+plot(suiTrain$Mental,suiTrain$SuiRate)
+plot(suiTrain$Disable,suiTrain$SuiRate)
+plot(suiTrain$Uninsured,suiTrain$SuiRate)
+plot(suiTrain$Poverty,suiTrain$SuiRate)
 
-# Very big loop
-models <- list(SuiRate0,Unemp1,Vet1,Arrest1,Mental1,Disable1,Unemp_Vet,Unemp_Arrest,Unemp_Mental,Unemp_Disable,Vet_Arrest,Vet_Mental,
-Vet_Disable,Arrest_Mental,Arrest_Disable,Mental_Disable,Unemp_Arrest_Vet,Unemp_Vet_Mental,Unemp_Vet_Disable,Unemp_Arrest_Mental,
-Unemp_Arrest_Disable,Unemp_Mental_Disable ,Vet_Arrest_Mental,Vet_Arrest_Disable,Arrest_Mental_Disable,
-Unemp_Arrest_Vet_Mental,Unemp_Vet_Disable_Arrest,Unemp_Vet_Disable_Mental,Unemp_Arrest_Mental_Disable,Vet_Arrest_Disable_Mental,
-Unemp_Arrest_Mental_Disable_Vet)
 
-modelname <- list("SuiRate0","Unemp1","Vet1","Arrest1","Mental1","Disable1","Unemp_Vet","Unemp_Arrest","Unemp_Mental","Unemp_Disable","Vet_Arrest","Vet_Mental",
-"Vet_Disable","Arrest_Mental","Arrest_Disable","Mental_Disable","Unemp_Arrest_Vet","Unemp_Vet_Mental","Unemp_Vet_Disable","Unemp_Arrest_Mental",
-"Unemp_Arrest_Disable","Unemp_Mental_Disable" ,"Vet_Arrest_Mental","Vet_Arrest_Disable","Arrest_Mental_Disable",
-"Unemp_Arrest_Vet_Mental","Unemp_Vet_Disable_Arrest","Unemp_Vet_Disable_Mental","Unemp_Arrest_Mental_Disable","Vet_Arrest_Disable_Mental",
-"Unemp_Arrest_Mental_Disable_Vet")
+############################################################
+# Best-subset Method
+############################################################
 
-# initialize empty list to compare models
-rank <- list()
-
-for (i in 1:31) {
-  # R outputs to .txt file instead of consolde
-  #sink(paste(modelname[i],".txt",sep="")) 
-  #print(lapply(models[i],summary))
-  summ <- lapply(models[i],summary)
-  rsquared <- summ[[1]][9]
-  #rank <- c(rank,list(rsquared,modelname[i]))
-  rank[[i]] <- c(rsquared,modelname[i])
-  # Revert R outputs to console
-  #sink()
-}
-
-# Arrange list of lists by first element of sublist (adjusted r-squared)
-rank <- rank[order(sapply(rank,'[[',1))]
-# Print sublist with highest adjusted R squared value
-print(rank[[31]])
-best_model <- Unemp_Arrest_Mental_Disable_Vet
-
-# Quicker way to do best subset - lecture 6 code:
-best_subsets <- regsubsets(SuiRate~Unemp + Vet + Arrest + Mental + Disable, nbest = 1, nvmax= 5, data=suiTrain,method="exhaustive")
+best_subsets <- regsubsets(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + Poverty, nbest = 1, nvmax= 7, data=suiTrain,method="exhaustive")
 summary_best<- summary(best_subsets)
 which.max(summary_best$adjr2)
 
+bestsubset_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured, data = suiTrain)
+
+
+############################################################
+# Cross - Validated Error
+############################################################
+
+lmFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + Poverty, data = suidat, method = "lm")
+
+ctrl<-trainControl(method = "cv",number = 10)
+lmCVFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + Poverty, data = suidat, method = "lm", trControl = ctrl, metric="RMSE")
+summary(lmCVFit)
+
+bestkfold_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured, data = suidat)
+summary(bestkfold_model)
+
+
+
+############################################################
+# Interaction Term Analysis
+############################################################
+best_uxa <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + uxa, data = suiTrain)
+summary(best_uxa)
+best_uxm <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + uxm, data = suiTrain)
+summary(best_uxm)
+best_uxd <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + uxd, data = suiTrain)
+summary(best_uxd)
+best_uxv <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + uxv, data = suiTrain)
+summary(best_uxv)
+best_uxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + uxu, data = suiTrain)
+summary(best_uxu)
+best_vxa <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + vxa, data = suiTrain)
+summary(best_vxa)
+best_vxm <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + vxm, data = suiTrain)
+summary(best_vxm)
+best_vxd <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + vxd, data = suiTrain)
+summary(best_vxd)
+best_vxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + vxu, data = suiTrain)
+summary(best_vxu)
+best_axm <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + axm, data = suiTrain)
+summary(best_axm)
+best_axd <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + axd, data = suiTrain)
+summary(best_axd)
+best_axu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + axu, data = suiTrain)
+summary(best_axu)
+best_mxd <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + mxd, data = suiTrain)
+summary(best_mxd)
+best_mxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + mxu, data = suiTrain)
+summary(best_mxu)
+best_dxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, data = suiTrain)
+summary(dxu)
+# The interaction term between the disable and uninsured variable increased the adjusted R square while keeping all variables statistically significant
+
+best_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured +dxu, data = suiTrain)
+summary(best_model)
 
 
 #Error term analysis
@@ -109,17 +101,6 @@ which.max(summary_best$adjr2)
 error_terms <- best_model$residuals # from the fit
 #All the error terms
 suiTrain$SuiRate - predict(best_model, suiTrain) 
-
-###Linear Response
-plot(suiTrain$Unemp,suiTrain$SuiRate)
-lines(suiTrain$Unemp, fitted(Unemp1), col="blue")
-plot(suiTrain$Vet,suiTrain$SuiRate)
-lines(suiTrain$Vet, fitted(Vet1), col="red")
-plot(suiTrain$Arrest,suiTrain$SuiRate)
-lines(suiTrain$Arrest, fitted(Arrest1), col="green")
-plot(suiTrain$Mental,suiTrain$SuiRate)
-lines(suiTrain$Mental, fitted(Mental1), col="yellow")
-plot(suiTrain$Disable,suiTrain$SuiRate)
 
 ### Errors independent and and variance about the same
 plot(error_terms)
@@ -153,17 +134,4 @@ max(suiTrain$SuiRate)
 
 min(suiTest$SuiRate)
 max(suiTest$SuiRate)
-
-############################################################
-# Cross - Validated Error
-############################################################
-
-lmFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable, data = suidat, method = "lm")
-
-ctrl<-trainControl(method = "cv",number = 10)
-lmCVFit<-train(SuiRate~Unemp + Vet + Arrest + Mental + Disable, data = suidat, method = "lm", trControl = ctrl, metric="RMSE")
-summary(lmCVFit)
-
-bestest_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental, data = suidat)
-summary(bestest_model)
 
