@@ -92,9 +92,8 @@ best_dxu <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu
 summary(dxu)
 # The interaction term between the disable and uninsured variable increased the adjusted R square while keeping all variables statistically significant
 
-best_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured +dxu, data = suiTrain)
+best_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, data = suiTrain)
 summary(best_model)
-
 
 #Error term analysis
 ####################
