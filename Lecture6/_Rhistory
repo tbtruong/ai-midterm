@@ -1,0 +1,107 @@
+library(leaps)
+library(caret)
+set.seed(314)
+install.packages("leaps")
+library(leaps)
+library(caret)
+set.seed(314)
+#########################################################
+#Create data
+#########################################################
+n <- 30
+temp = as.data.frame(matrix(runif(300), ncol=10))
+y <- 10 + 5*temp$V1 + 3*temp$V2 + 4*temp$V4 + rnorm(n, sd=.1)
+df <- data.frame(temp, y)
+yemp
+temp
+#y = 10 + 5 * X1 + 3 *X2 + 4*X4 + e_i
+df <- data.frame(temp, y)
+lm_full <- lm(formula = y ~ ., data=df)
+summary(lm_full)
+lm_reduced <- lm(formula = y ~ V1 + V2 + V4, data=df)
+summary(lm_reduced)
+lm_drop_useful_variable <- lm(formula = y~V1 +V2, data=df)
+summary(lm_reduced)
+anova(lm_full, lm_reduced) #comparison of two models where second model only has insignificant variables
+anova(lm_full, lm_drop_useful_variable) #comparison of two models where second model drops significant variable
+#Check of the formula by hand
+# Fit full model
+rss_full <- sum(lm_full$residuals**2)
+ndf_full <- lm_full$df.residual
+cat("\nRSS on full model: ", rss_full, ", degrees of freedom: ", ndf_full)
+# Fit submodel
+rss_reduced <- sum(lm_reduced$residuals**2)
+ndf_reduced <- lm_reduced$df.residual
+cat("\nRSS on submodel: ", rss_reduced, ", degrees of freedom: ", ndf_reduced)
+#Compute F
+Fstat <- ((rss_reduced-rss_full)/(ndf_reduced-ndf_full))/(rss_full/ndf_full)
+pval <- pf(Fstat, ndf_reduced-ndf_full, ndf_full, lower.tail=FALSE)
+cat("\nF-statistic = ", Fstat, ", p-value = ", pval)
+?lm
+#########################################################
+#R and R^2
+#########################################################
+summary(lm_full)
+summary(lm_reduced) #
+summary(lm_drop_useful_variable)
+?choose
+choose(50,2)
+choose(50,3)
+#########################################################
+# Best Subsets, Forward, and Backward Regression
+#########################################################
+summary(lm_full)
+2^10
+best_subsets <- regsubsets(y ~ ., nbest = 1, nvmax= NULL, data=df,method="exhaustive")
+summary_best<- summary(best_subsets)
+which.max(summary_best$adjr2)
+best_subsets
+summary_best
+foward_regression <-  regsubsets(y ~ ., nbest = 1, nvmax= NULL, data=df,method="forward")
+summary_forward <- summary(foward_regression)
+which.max(summary_forward$adjr2)
+summary_forward
+summary_best
+summary_forward$outmat
+lmFit<-train(y~., data = df, method = "lm")
+ctrl<-trainControl(method = "cv",number = 10)
+lmCVFit<-train(y ~ ., data = df, method = "lm", trControl = ctrl, metric="RMSE")
+summary(lmCVFit)
+summary(lm(y~x1+x3+x4))
+summary(lm(y~V1+V3+V4))
+library(caret)
+### Data and model fitting
+set.seed(314)
+n <- 50
+x <- sort(runif(n, -2, 2))
+y <- 3*x^3 + 5*x^2 + 0.5*x + 20 +rnorm(n, sd =3) # a 3 polynomial model
+df <- data.frame(x,y)
+nterm <- c(1,2,3,5,7,15)
+plot(y~x, df, ylab="y")
+PAL <- colorRampPalette(c("red", "blue", "cyan","green"))
+COLS <- PAL(length(nterm))
+for(i in seq(nterm)){
+fit <- lm(y ~ poly(x, degree=nterm[i]), data=df)
+newdat <- data.frame(x=seq(min(df$x), max(df$x),length.out =100))
+lines(newdat$x, predict(fit, newdat), col=COLS[i])
+}
+legend(x=-2, y= 55, legend=paste0(nterm, c("", "", "*", "", "")), title="Poly Deg", bty="n", col=COLS, lty=1)
+RMSE_results <- c()
+for(i in 1:12){
+print(paste("Processing degree:", i))
+ctrl<-trainControl(method = "cv",number = 10)
+f = bquote(y~ poly(x, .(i)))
+lmCVFit<-train(as.formula(f), data = df, method = "lm", trControl = ctrl, metric="Rsquared")
+RMSE_results <- c(RMSE_results,lmCVFit$results$RMSE)
+}
+overfit_errors <- c()
+for(i in 1:12){
+fit <- lm(y ~ poly(x, degree=i))
+overfit_errors <- c(overfit_errors, sqrt(mean(fit$residuals^2)))
+}
+ylim <- range(min(RMSE_results)*.8, max(RMSE_results)*1.2)
+plot(1:12, RMSE_results, log="y", col=1, t="o", ylim=ylim, xlab="Complexity (poly degree)", ylab="RMSE")
+lines(1:12, overfit_errors, col=2, t="o")
+abline(v=3, lty=2, col=8)
+abline(h=min(RMSE_results), lty=2, col=8)
+legend("top", legend=c("No CV RMSE", "Cross-validation RMSE"), bty="n", col=2:1, lty=1, pch=1)
