@@ -42,7 +42,7 @@ summary_best<- summary(best_subsets)
 which.max(summary_best$adjr2)
 
 bestsubset_model <- lm(SuiRate~Unemp + Vet + Arrest + Mental + Disable + Uninsured, data = suiTrain)
-linear_model <- lm(SuiRate~Vet + Arrest + Mental, data = suiTrain)
+linear_model <- lm(SuiRate~Unemp + Uninsured + Mental, data = suiTrain)
 summary(linear_model)
 
 ############################################################
@@ -140,13 +140,6 @@ suiTest$SuiRate - predict(best_model, suiTest)
 mean(suiTest$SuiRate - predict(best_model, suiTest))
 sd(suiTest$SuiRate - predict(best_model, suiTest))
 
-mean(suiTrain$SuiRate - predict(best_model, suiTrain))
-sd(suiTrain$SuiRate - predict(best_model, suiTrain))
-
-rmse(suiTest$SuiRate, predict(best_model, suiTest))
-sse(suiTest$SuiRate, predict(best_model, suiTest))
-mae(suiTest$SuiRate, predict(best_model, suiTest))
-
 # Determine observation range between training and test set
 min(suiTrain$SuiRate)
 max(suiTrain$SuiRate)
@@ -154,26 +147,30 @@ max(suiTrain$SuiRate)
 min(suiTest$SuiRate)
 max(suiTest$SuiRate)
 
-#comparison
+mean(suiTest$SuiRate - predict(linear_model, suiTest))
+sd(suiTest$SuiRate - predict(linear_model, suiTest))
 
+#comparison
+summary(best_model)
 AIC(best_model)
 BIC(best_model)
 rmse(suiTest$SuiRate, predict(best_model, suiTest))
 mae(suiTest$SuiRate, predict(best_model, suiTest))
 
+summary(bestkfold_model)
 AIC(bestkfold_model)
 BIC(bestkfold_model)
-rmse(suiTest$SuiRate, predict(best_model, suiTest))
-mae(suiTest$SuiRate, predict(best_model, suiTest))
+rmse(suiTest$SuiRate, predict(bestkfold_model, suiTest))
+mae(suiTest$SuiRate, predict(bestkfold_model, suiTest))
 
-
+summary(bestsubset_model)
 AIC(bestsubset_model)
 BIC(bestsubset_model)
-rmse(suiTest$SuiRate, predict(best_model, suiTest))
-mae(suiTest$SuiRate, predict(best_model, suiTest))
+rmse(suiTest$SuiRate, predict(bestsubset_model, suiTest))
+mae(suiTest$SuiRate, predict(bestsubset_model, suiTest))
 
-
+summary(linear_model)
 AIC(linear_model)
 BIC(linear_model)
-rmse(suiTest$SuiRate, predict(best_model, suiTest))
-mae(suiTest$SuiRate, predict(best_model, suiTest))
+rmse(suiTest$SuiRate, predict(linear_model, suiTest))
+mae(suiTest$SuiRate, predict(linear_model, suiTest))
