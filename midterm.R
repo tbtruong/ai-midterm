@@ -113,7 +113,7 @@ qqline(error_terms)
 
 ###############
 # Prediction in R
-###########
+
 predict(best_model, suiTest)
 suiTest$SuiRate - predict(best_model, suiTest)
 
@@ -135,14 +135,52 @@ max(suiTrain$SuiRate)
 min(suiTest$SuiRate)
 max(suiTest$SuiRate)
 
+###########
+
 # Generalized Least Squared Model
 suiTrain$resi <- best_model$residuals
 varfunc.ols <- lm(log(resi^2) ~ log(Unemp)+log(Vet)+log(Arrest)+log(Disable)+log(dxu)+log(Uninsured)+log(Mental), data = suiTrain)
 suiTrain$varfunc <- exp(varfunc.ols$fitted.values)
 sui.gls <- lm(SuiRate ~Unemp + Vet + Arrest + Mental + Disable + Uninsured + dxu, weights=1/sqrt(varfunc),data=suiTrain)
-bptest(sui.gls)
+summary(sui.gls)
 
 # Robust Regression Model
 best_robust <- lmrob(formula = SuiRate ~ Unemp + Vet + Arrest + Mental + Disable + Uninsured + 
                        dxu, data = suiTrain)
-bptest(best_robust)
+summary(best_robust)
+
+# Best linear Model
+best_linear <- lm(SuiRate ~  Mental + Uninsured, data = suiTrain)
+summary(best_linear)
+bptest(best_linear)
+linear_errors <- best_linear$residuals 
+plot(linear_errors)
+
+
+
+# Comparison
+summary(best_model)
+AIC(best_model)
+BIC(best_model)
+rmse(suiTest$SuiRate, predict(best_model, suiTest))
+mae(suiTest$SuiRate, predict(best_model, suiTest))
+
+summary(bestkfold_model)
+AIC(bestkfold_model)
+BIC(bestkfold_model)
+rmse(suiTest$SuiRate, predict(bestkfold_model, suiTest))
+mae(suiTest$SuiRate, predict(bestkfold_model, suiTest))
+
+summary(bestsubset_model)
+AIC(bestsubset_model)
+BIC(bestsubset_model)
+rmse(suiTest$SuiRate, predict(bestsubset_model, suiTest))
+mae(suiTest$SuiRate, predict(bestsubset_model, suiTest))
+
+summary(linear_model)
+AIC(linear_model)
+BIC(linear_model)
+rmse(suiTest$SuiRate, predict(linear_model, suiTest))
+mae(suiTest$SuiRate, predict(linear_model, suiTest))
+
+
